@@ -1,0 +1,30 @@
+# Node modules
+node_modules/
+
+# Environment variables and secrets
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Build directories (if applicable)
+dist/
+build/
+
+# Optional: Coverage and cache files
+coverage/
+*.cache
