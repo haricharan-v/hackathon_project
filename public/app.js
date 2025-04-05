@@ -116,10 +116,17 @@ function updateHeartRate() {
   fetch("/heartrate")
     .then((response) => response.json())
     .then((data) => {
-      document.getElementById("bpmDisplay").textContent = `${data.bpm} BPM`;
+      const bpmDisplay = document.getElementById("bpmDisplay");
+      // If the Arduino hasn't measured a valid BPM yet, show "Measuring heart rate..."
+      if (data.bpm <= 0) {
+        bpmDisplay.textContent = "Measuring heart rate...";
+      } else {
+        bpmDisplay.textContent = `${data.bpm} BPM`;
+      }
     })
     .catch((err) => console.error("Error fetching heart rate:", err));
 }
+
 
 // Poll the heart rate every 2 seconds
 setInterval(updateHeartRate, 2000);

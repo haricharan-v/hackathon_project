@@ -1,73 +1,153 @@
-/* public/styles.css */
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+/* Reset some defaults */
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #f0f2f5;
+  color: #333;
+}
+
+/* Main container */
 .container {
-  width: 80%;
-  margin: 50px auto;
-  padding: 20px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
 }
 
-h1, h2, h3 {
+/* Header styles */
+header {
   text-align: center;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-label {
-  font-weight: bold;
-}
-
-textarea {
-  width: 100%;
-  height: 80px;
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-}
-
-button {
-  padding: 10px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
-.results {
-  margin-top: 30px;
-  padding: 20px;
-  background-color: #e9e9e9;
-  border-radius: 8px;
-}
-
-.section {
   margin-bottom: 20px;
 }
 
-button[type="submit"]:hover {
-  background-color: rgb(33, 131, 26);
+header h1 {
+  font-size: 2rem;
+  margin-bottom: 5px;
 }
 
+header p {
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Form styles */
+form {
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+textarea, input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+/* Location group */
+.location-group {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.location-group input[type="text"] {
+  min-width: 220px;
+  flex: 1;
+}
+
+/* Button styling */
+button {
+  cursor: pointer;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+
+#submitBtn {
+  background-color: #007bff;
+  color: #fff;
+}
+
+#submitBtn:hover {
+  background-color: #e63946; /* Red on hover */
+}
+
+#getLocation {
+  background-color: #28a745;
+  color: #fff;
+}
+
+#getLocation:hover {
+  background-color: #218838;
+}
+
+/* Results section */
+.results {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.results h2,
+.results h3 {
+  margin-bottom: 15px;
+}
+
+/* Spacing between each section of AI output */
+.section {
+  margin: 20px 0;
+}
+
+/* Lists remain left-aligned for readability */
+.section ul {
+  list-style-type: disc;
+  list-style-position: inside;
+  text-align: left;
+  margin-left: 1rem;
+}
+
+/* Center paragraphs within results */
+.weather-statement,
+.heart-rate-assessment {
+  margin: 10px 0;
+  display: block;
+  text-align: center;
+}
+
+/* Make the measured heart rate appear red */
+.heart-rate {
+  color: red;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+/* Spinner for loading state */
 .spinner {
-  border: 2px solid #f3f3f3; /* Light grey */
-  border-top: 2px solid #555; /* Darker grey */
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #555;
   border-radius: 50%;
   width: 14px;
   height: 14px;
@@ -80,4 +160,19 @@ button[type="submit"]:hover {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.heart-rate {
+  font-weight: bold;
+  font-size: 1.5rem;
+  animation: heartbeat 1.2s infinite alternate;
+}
+
+@keyframes heartbeat {
+  0% {
+    color: #ff0000;    /* Bright red */
+  }
+  100% {
+    color: #b20000;    /* Slightly darker red */
+  }
 }
