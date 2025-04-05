@@ -100,3 +100,16 @@ document.getElementById("healthForm").addEventListener("submit", function(event)
     alert("An error occurred while processing your request.");
   });
 });
+
+// NEW: Function to update the heart rate display by polling the /heartrate endpoint
+function updateHeartRate() {
+  fetch("/heartrate")
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById("bpmDisplay").textContent = `${data.bpm} BPM`;
+    })
+    .catch(err => console.error("Error fetching heart rate:", err));
+}
+
+// Poll the heart rate every 2 seconds
+setInterval(updateHeartRate, 2000);

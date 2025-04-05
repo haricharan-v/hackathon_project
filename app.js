@@ -5,6 +5,34 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const OpenAI = require("openai");
 
+// Use updated SerialPort API
+const { SerialPort } = require("serialport");
+const { ReadlineParser } = require("@serialport/parser-readline");
+
+// Replace with your actual Arduino port path
+const arduinoPortPath = "COM5";
+
+// Create a new SerialPort instance with the updated syntax
+const port = new SerialPort({
+  path: arduinoPortPath,
+  baudRate: 9600,
+});
+
+// Create a parser that splits data on newline characters
+const parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
+
+// Global variable to store the latest BPM received from the Arduino
+let latestBPM = 0;
+
+// Listen for data from the Arduino
+parser.on("data", (data) => {
+  const bpm = parseInt(data, 10);
+  if (!isNaN(bpm)) {
+    latestBPM = bpm;
+    console.log("Received BPM from Arduino:", latestBPM);
+  }
+});
+
 // Initialize the OpenAI client with your API key from .env
 const openAIClient = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
@@ -13,7 +41,7 @@ const openAIClient = new OpenAI({
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Hardcode a "current weather" string for your pitch/demo
+// Hardcode a "current weather" string for demonstration
 const weatherNow = "Cloudy with sunny breaks around 10°C, feels like 7°C";
 
 // Middleware to parse JSON bodies
@@ -26,7 +54,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.post("/analyze", async (req, res) => {
   const { symptoms, conditions, history, details, otherDetails, location } = req.body;
 
-  // Build a prompt incorporating the patient's details + hardcoded weather
+  // Build a prompt incorporating the patient's details and hardcoded weather
   const prompt = `Patient Details:
 Symptoms: ${symptoms}
 Conditions: ${conditions}
@@ -37,7 +65,7 @@ Location: ${location}
 Weather: ${weatherNow}
 
 Based on the above information, provide your response in JSON with four keys:
-- "weather_statement": a sentence that starts with "Since the weather outside currently is ..." describing the weather (based on the string above) and leading into the exercise recommendations.
+- "weather_statement": a sentence that starts with "Since the weather outside currently is ..." describing the weather and leading into the exercise recommendations.
 - "outdoor_exercises": an array where each item is an object with "name" (the exercise) and "explanation" (why it's beneficial).
 - "outdoor_foods": an array where each item is an object with "name" (the food) and "explanation" (why it's beneficial).
 - "potential_diseases": an array where each item is an object with "name" (the potential disease) and "explanation" (why it might be a concern).
@@ -45,35 +73,35 @@ Based on the above information, provide your response in JSON with four keys:
 Return ONLY valid JSON in this exact structure with no extra keys or text.`;
 
   try {
-    // Call the OpenAI API with a system message to strictly return JSON
+    // Call the OpenAI API with a system message instructing the proper format
     const completion = await openAIClient.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
           content:
-            `You are a medical advisor AI that provides personalized health advice. 
-             Return ONLY valid JSON in this exact structure:
-             {
-                "weather_statement": "A sentence explaining the current weather and leading into the recommendations",
-                "outdoor_exercises": [ { "name": "exercise name", "explanation": "explanation text" }, ... ],
-                "outdoor_foods": [ { "name": "food name", "explanation": "explanation text" }, ... ],
-                "potential_diseases": [ { "name": "disease name", "explanation": "explanation text" }, ... ]
-             }
-             Do not include any extra text or keys outside the JSON.`
+            `You are a medical advisor AI that provides personalized health advice.
+Return ONLY valid JSON in this exact structure:
+{
+  "weather_statement": "A sentence explaining the current weather and leading into the recommendations",
+  "outdoor_exercises": [ { "name": "exercise name", "explanation": "explanation text" }, ... ],
+  "outdoor_foods": [ { "name": "food name", "explanation": "explanation text" }, ... ],
+  "potential_diseases": [ { "name": "disease name", "explanation": "explanation text" }, ... ]
+}
+Do not include any extra text or keys outside the JSON.`
         },
         {
           role: "user",
           content: prompt,
         },
       ],
-      temperature: 0.9
+      temperature: 0.9,
     });
 
     // Extract the AI's reply (should be valid JSON)
     const aiResponse = completion.choices[0].message.content.trim();
 
-    // Attempt to parse JSON
+    // Attempt to parse the JSON response
     let parsed;
     try {
       parsed = JSON.parse(aiResponse);
@@ -89,12 +117,17 @@ Return ONLY valid JSON in this exact structure with no extra keys or text.`;
     // Send parsed JSON to the client
     res.json({
       success: true,
-      data: parsed
+      data: parsed,
     });
   } catch (error) {
     console.error("Error calling OpenAI API:", error);
     res.status(500).json({ error: "Failed to process your request." });
   }
+});
+
+// GET endpoint to return the current heart rate (BPM) from the Arduino
+app.get("/heartrate", (req, res) => {
+  res.json({ bpm: latestBPM });
 });
 
 // Start the server
