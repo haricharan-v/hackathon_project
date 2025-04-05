@@ -50,15 +50,21 @@ document.getElementById("healthForm").addEventListener("submit", function(event)
     const aiResults = document.getElementById("aiResults");
 
     if (data.success && data.data) {
-      // Extract arrays and weather_statement from the parsed JSON
-      const { weather_statement, outdoor_exercises, outdoor_foods, potential_diseases } = data.data;
+      // Extract keys from the parsed JSON
+      const { weather_statement, heart_rate_assessment, outdoor_exercises, outdoor_foods, potential_diseases } = data.data;
 
-      // Build HTML output with the weather statement and explanation for each recommendation
+      // Build HTML output with the weather statement, heart rate assessment, and other recommendations
       let htmlOutput = `<h2>AI Output</h2>`;
 
       if (weather_statement) {
         htmlOutput += `<div class="section">
           <p class="weather-statement"><em>${weather_statement}</em></p>
+        </div>`;
+      }
+
+      if (heart_rate_assessment) {
+        htmlOutput += `<div class="section">
+          <p class="heart-rate-assessment"><strong>Heart Rate Assessment:</strong> ${heart_rate_assessment}</p>
         </div>`;
       }
 
@@ -101,7 +107,7 @@ document.getElementById("healthForm").addEventListener("submit", function(event)
   });
 });
 
-// NEW: Function to update the heart rate display by polling the /heartrate endpoint
+// Function to update the heart rate display by polling the /heartrate endpoint
 function updateHeartRate() {
   fetch("/heartrate")
     .then(response => response.json())

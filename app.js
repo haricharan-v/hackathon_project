@@ -9,10 +9,10 @@ const OpenAI = require("openai");
 const { SerialPort } = require("serialport");
 const { ReadlineParser } = require("@serialport/parser-readline");
 
-// Replace with your actual Arduino port path
+// Replace with your actual Arduino port path (e.g., "COM5")
 const arduinoPortPath = "COM5";
 
-// Create a new SerialPort instance with the updated syntax
+// Create a new SerialPort instance
 const port = new SerialPort({
   path: arduinoPortPath,
   baudRate: 9600,
@@ -41,7 +41,7 @@ const openAIClient = new OpenAI({
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Hardcode a "current weather" string for demonstration
+// Hardcode a "current weather" string for your demo
 const weatherNow = "Cloudy with sunny breaks around 10°C, feels like 7°C";
 
 // Middleware to parse JSON bodies
@@ -54,18 +54,20 @@ app.use(express.static(path.join(__dirname, "public")));
 app.post("/analyze", async (req, res) => {
   const { symptoms, conditions, history, details, otherDetails, location } = req.body;
 
-  // Build a prompt incorporating the patient's details and hardcoded weather
+  // Build a prompt that includes the heart rate reading along with other patient details
   const prompt = `Patient Details:
 Symptoms: ${symptoms}
 Conditions: ${conditions}
 Medical History: ${history}
 Age/Weight/Other Details: ${details}
 Other Important Details: ${otherDetails}
+Heart Rate: ${latestBPM} BPM.
 Location: ${location}
 Weather: ${weatherNow}
 
-Based on the above information, provide your response in JSON with four keys:
-- "weather_statement": a sentence that starts with "Since the weather outside currently is ..." describing the weather and leading into the exercise recommendations.
+Based on the above information, provide your response in JSON with five keys:
+- "weather_statement": a sentence that starts with "Since the weather outside currently is ..." describing the weather and leading into the recommendations.
+- "heart_rate_assessment": a brief statement assessing the heart rate (for example, if it's above a typical resting value, mention that it is high).
 - "outdoor_exercises": an array where each item is an object with "name" (the exercise) and "explanation" (why it's beneficial).
 - "outdoor_foods": an array where each item is an object with "name" (the food) and "explanation" (why it's beneficial).
 - "potential_diseases": an array where each item is an object with "name" (the potential disease) and "explanation" (why it might be a concern).
@@ -73,7 +75,7 @@ Based on the above information, provide your response in JSON with four keys:
 Return ONLY valid JSON in this exact structure with no extra keys or text.`;
 
   try {
-    // Call the OpenAI API with a system message instructing the proper format
+    // Call the OpenAI API with a system message to enforce the JSON structure
     const completion = await openAIClient.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
@@ -84,6 +86,7 @@ Return ONLY valid JSON in this exact structure with no extra keys or text.`;
 Return ONLY valid JSON in this exact structure:
 {
   "weather_statement": "A sentence explaining the current weather and leading into the recommendations",
+  "heart_rate_assessment": "A brief assessment of the patient's heart rate",
   "outdoor_exercises": [ { "name": "exercise name", "explanation": "explanation text" }, ... ],
   "outdoor_foods": [ { "name": "food name", "explanation": "explanation text" }, ... ],
   "potential_diseases": [ { "name": "disease name", "explanation": "explanation text" }, ... ]
