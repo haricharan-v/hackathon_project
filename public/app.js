@@ -110,12 +110,11 @@ document.getElementById("healthForm").addEventListener("submit", function (event
           </ul>
         </div>`;
 
-        // New sections for location-based info:
         if (nearby_gyms && nearby_gyms.length > 0) {
           htmlOutput += `<div class="section">
             <h3>Nearby Gyms</h3>
             <ul>
-              ${nearby_gyms.map(gym => `<li><strong>${gym.name}</strong>: ${gym.address}</li>`).join("")}
+              ${nearby_gyms.map(gym => `<li><strong>${gym.name}</strong>: <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(gym.address)}&travelmode=bicycling" target="_blank">${gym.address}</a></li>`).join("")}
             </ul>
           </div>`;
         }
@@ -124,7 +123,7 @@ document.getElementById("healthForm").addEventListener("submit", function (event
           htmlOutput += `<div class="section">
             <h3>Medicine Stores</h3>
             <ul>
-              ${medicine_stores.map(store => `<li><strong>${store.name}</strong>: ${store.address}</li>`).join("")}
+              ${medicine_stores.map(store => `<li><strong>${store.name}</strong>: <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(store.address)}&travelmode=bicycling" target="_blank">${store.address}</a></li>`).join("")}
             </ul>
           </div>`;
         }
@@ -133,7 +132,7 @@ document.getElementById("healthForm").addEventListener("submit", function (event
           htmlOutput += `<div class="section">
             <h3>Food Stores</h3>
             <ul>
-              ${food_stores.map(store => `<li><strong>${store.name}</strong>: ${store.address}</li>`).join("")}
+              ${food_stores.map(store => `<li><strong>${store.name}</strong>: <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(store.address)}&travelmode=bicycling" target="_blank">${store.address}</a></li>`).join("")}
             </ul>
           </div>`;
         }
