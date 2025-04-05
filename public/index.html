@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Personalized Health Advice</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <h1>Personalized Health Advice</h1>
+    <form id="healthForm">
+      <label for="symptoms">1. Enter your symptoms:</label>
+      <textarea id="symptoms" required></textarea>
+      
+      <label for="conditions">2. Enter your conditions:</label>
+      <textarea id="conditions" required></textarea>
+      
+      <label for="history">3. Enter your medical history:</label>
+      <textarea id="history" required></textarea>
+      
+      <label for="details">4. Enter your age, weight, etc.:</label>
+      <textarea id="details" required></textarea>
+      
+      <label for="otherDetails">5. Any other important details:</label>
+      <textarea id="otherDetails"></textarea>
+      
+      <button type="submit">Submit</button>
+    </form>
+    
+    <div id="aiResults" class="results"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
