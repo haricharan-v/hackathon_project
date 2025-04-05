@@ -1,11 +1,15 @@
 // public/app.js
 
-// Global variables to store location data
+// Global variables to store location data and for Chart.js
 let userLocation = "";
 let userLatitude = "";
 let userLongitude = "";
+let bpmChart = null;
+let bpmData = [];     // Array to store BPM readings
+let timeLabels = [];  // Array for time labels
+const maxDataPoints = 30; // Maximum data points for the chart
 
-// Event listener for the "Get My Location" button
+// Event listener for "Get My Location" button
 document.getElementById("getLocation").addEventListener("click", function () {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
@@ -36,7 +40,7 @@ document.getElementById("healthForm").addEventListener("submit", function (event
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<span class="spinner"></span> Loading...';
 
-  // Collect input values from the form fields
+  // Collect input values
   const symptoms = document.getElementById("symptoms").value;
   const conditions = document.getElementById("conditions").value;
   const history = document.getElementById("history").value;
@@ -44,7 +48,7 @@ document.getElementById("healthForm").addEventListener("submit", function (event
   const otherDetails = document.getElementById("otherDetails").value;
   const location = userLocation || document.getElementById("location").value || "Not provided";
 
-  // Send the collected data to the /analyze endpoint
+  // Send data to the /analyze endpoint
   fetch("/analyze", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -75,7 +79,8 @@ document.getElementById("healthForm").addEventListener("submit", function (event
           food_stores,
         } = data.data;
 
-        let htmlOutput = `<h2>AI Output</h2>`;
+        // Change header to "Results"
+        let htmlOutput = `<h2>Results</h2>`;
 
         if (weather_statement) {
           htmlOutput += `<div class="section">
@@ -140,7 +145,7 @@ document.getElementById("healthForm").addEventListener("submit", function (event
         aiResults.innerHTML = htmlOutput;
       } else if (data.rawResponse) {
         aiResults.innerHTML = `
-          <h2>AI Output (Raw)</h2>
+          <h2>Results (Raw)</h2>
           <pre>${data.rawResponse}</pre>
           <p style="color: red;">Error: ${data.error}</p>
         `;
@@ -153,13 +158,12 @@ document.getElementById("healthForm").addEventListener("submit", function (event
       alert("An error occurred while processing your request.");
     })
     .finally(() => {
-      // Re-enable the submit button and reset its text
       submitBtn.disabled = false;
       submitBtn.innerHTML = 'Submit';
     });
 });
 
-// Function to update the heart rate display by polling the /heartrate endpoint
+// Function to update the heart rate display and chart
 function updateHeartRate() {
   fetch("/heartrate")
     .then((response) => response.json())
@@ -169,10 +173,85 @@ function updateHeartRate() {
         bpmDisplay.textContent = "Measuring heart rate...";
       } else {
         bpmDisplay.textContent = `${data.bpm} BPM`;
+
+        // Update chart data
+        const now = new Date();
+        const timeLabel = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        bpmData.push(data.bpm);
+        timeLabels.push(timeLabel);
+
+        // Limit data arrays
+        if (bpmData.length > maxDataPoints) {
+          bpmData.shift();
+          timeLabels.shift();
+        }
+        if (bpmChart) {
+          bpmChart.update();
+        }
       }
     })
     .catch((err) => console.error("Error fetching heart rate:", err));
 }
 
-// Poll the heart rate every 2 seconds
+// Poll heart rate every 2 seconds
 setInterval(updateHeartRate, 2000);
+
+// Initialize BPM Chart using Chart.js when the page loads
+window.addEventListener('DOMContentLoaded', () => {
+  const ctx = document.getElementById("bpmChart").getContext("2d");
+  bpmChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: timeLabels,
+      datasets: [{
+        label: 'Heart Rate (BPM)',
+        data: bpmData,
+        borderColor: '#ff4d4d',
+        backgroundColor: 'rgba(255, 77, 77, 0.2)',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: '#ff4d4d',
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Time',
+            color: '#ddd'
+          },
+          ticks: {
+            color: '#ddd'
+          },
+          grid: {
+            color: 'rgba(255,255,255,0.1)'
+          }
+        },
+        y: {
+          beginAtZero: false,
+          title: {
+            display: true,
+            text: 'BPM',
+            color: '#ddd'
+          },
+          ticks: {
+            color: '#ddd'
+          },
+          grid: {
+            color: 'rgba(255,255,255,0.1)'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: '#ddd'
+          }
+        }
+      }
+    }
+  });
+});

@@ -1,173 +1,203 @@
-/* Reset and base styles */
+/* BASE RESET */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
+/* BODY + BACKGROUND */
 body {
   font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #e2e8f0, #f0f4f8);
-  color: #333;
-  padding: 20px;
+  background: radial-gradient(circle, #3a3a3a 0%, #2a2a2a 100%);
+  color: #eee;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* Container styling */
-.container {
-  max-width: 800px;
-  margin: 40px auto;
-  background: #fff;
-  padding: 30px 40px;
-  border-radius: 12px;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-  transition: transform 0.3s ease;
+/* TOP HEADER */
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #222;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.container:hover {
-  transform: translateY(-5px);
-}
-
-/* Header styling */
-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-header h1 {
+.top-header .logo {
   font-family: 'Poppins', sans-serif;
-  font-size: 2.5rem;
-  margin-bottom: 5px;
-  color: #2c3e50;
+  font-size: 1.6rem;
+  color: #66b3ff;
+  letter-spacing: 1px;
 }
 
-header .tagline {
-  font-size: 1.1rem;
-  color: #7f8c8d;
+.top-header .tagline {
+  font-size: 0.95rem;
+  color: #bbb;
 }
 
-/* Form styling */
-form {
-  margin-bottom: 30px;
+/* MAIN CONTENT LAYOUT */
+.main-content {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.form-section, .results-section {
+  flex: 1;
+  min-width: 0;
+}
+
+/* FORM SECTION */
+.form-section {
+  background: rgba(50, 50, 50, 0.9); /* Lighter than before */
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.form-section h2 {
+  margin-bottom: 1rem;
+  font-family: 'Poppins', sans-serif;
+  color: #66b3ff;
+  font-size: 1.3rem;
 }
 
 .form-group {
-  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
+  margin-bottom: 1rem;
 }
 
 .form-group label {
-  font-weight: 500;
-  margin-bottom: 8px;
-  color: #34495e;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: #ccc;
 }
 
-textarea, input[type="text"] {
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  background: #fafafa;
+.form-group textarea, .form-group input[type="text"] {
+  background: #2c2c2c;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 0.75rem;
+  color: #ddd;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
 }
 
-textarea:focus, input[type="text"]:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+.form-group textarea:focus, .form-group input[type="text"]:focus {
+  border-color: #66b3ff;
   outline: none;
 }
 
-/* Location group */
 .location-group {
   flex-direction: row;
   align-items: center;
-  gap: 10px;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
 .location-group input[type="text"] {
-  min-width: 240px;
   flex: 1;
+  min-width: 240px;
 }
 
 /* Button styling */
 button {
   cursor: pointer;
-  padding: 12px 24px;
-  font-size: 1rem;
+  background: #66b3ff;
+  color: #111;
+  font-weight: 700;
   border: none;
-  border-radius: 6px;
-  transition: background 0.3s ease, transform 0.2s ease;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  transition: background 0.3s, transform 0.2s;
 }
 
-#submitBtn {
-  background-color: #007bff;
-  color: #fff;
+button:hover {
+  background: #5394e0;
+  transform: scale(1.02);
 }
 
-#submitBtn:hover {
-  background-color: #e63946; /* Red on hover */
+/* RESULTS SECTION */
+.results-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-#getLocation {
-  background-color: #28a745;
-  color: #fff;
-}
-
-#getLocation:hover {
-  background-color: #218838;
-}
-
-/* Results section styling */
-.results {
-  background-color: #f9f9f9;
+/* Card styling for heart rate + AI output */
+.card {
+  background: rgba(50, 50, 50, 0.9); /* Lighter than before */
   border-radius: 8px;
-  padding: 25px;
-  margin-bottom: 30px;
-  text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  padding: 1.5rem;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
-.results h2,
-.results h3 {
-  margin-bottom: 15px;
-  color: #2c3e50;
+.card h2 {
+  font-family: 'Poppins', sans-serif;
+  color: #66b3ff;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
 }
 
-/* Section spacing within results */
-.section {
-  margin: 25px 0;
-}
-
-/* Lists within sections */
-.section ul {
-  list-style-type: disc;
-  list-style-position: inside;
-  text-align: left;
-  margin-left: 1.5rem;
-}
-
-/* Center specific paragraphs within results */
-.weather-statement,
-.heart-rate-assessment {
-  margin: 12px 0;
-  text-align: center;
-}
-
-/* Heartbeat animation for measured heart rate */
+/* HEART RATE TEXT + ANIMATION */
 .heart-rate {
   font-weight: bold;
-  font-size: 1.8rem;
+  font-size: 1.3rem;
+  text-align: center;
+  margin-bottom: 1rem;
   animation: heartbeat 1.2s infinite alternate;
+  color: #ff4d4d;
 }
 
 @keyframes heartbeat {
-  0% {
-    color: #ff0000; /* Bright red */
-  }
-  100% {
-    color: #3d0000; /* Very dark red */
-  }
+  0% { color: #ff4d4d; }
+  100% { color: #3d0000; }
+}
+
+/* CHART */
+.chart-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* AI Output + sections */
+#aiResults h2, #aiResults h3 {
+  color: #66b3ff;
+}
+
+.section {
+  margin: 1rem 0;
+}
+
+.section ul {
+  list-style-type: disc;
+  list-style-position: inside;
+  margin-left: 1rem;
+  color: #ddd;
+  text-align: left;
+}
+
+/* Link styling for location-based info */
+#aiResults a {
+  color: #66b3ff;
+  text-decoration: underline;
+}
+
+#aiResults a:hover {
+  color: #66b3ff;
 }
 
 /* Spinner for loading state */

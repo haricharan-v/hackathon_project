@@ -4,58 +4,71 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PulseCompass</title>
-  <!-- Google Fonts for a modern look -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js for live BPM visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>PulseCompass</h1>
-      <p class="tagline">Navigate Your Health Journey</p>
-    </header>
-    <main>
+  <header class="top-header">
+    <div class="logo">PulseCompass</div>
+    <div class="tagline">Navigate Your Health Journey</div>
+  </header>
+
+  <main class="main-content">
+    <!-- Left side: Health Form -->
+    <section class="form-section">
+      <h2>Health Details</h2>
       <form id="healthForm">
         <div class="form-group">
-          <label for="symptoms">1. Enter your symptoms:</label>
+          <label for="symptoms">Symptoms</label>
           <textarea id="symptoms" placeholder="e.g., headache, fatigue" required></textarea>
         </div>
         <div class="form-group">
-          <label for="conditions">2. Enter your conditions:</label>
+          <label for="conditions">Conditions</label>
           <textarea id="conditions" placeholder="e.g., hypertension, asthma" required></textarea>
         </div>
         <div class="form-group">
-          <label for="history">3. Enter your medical history:</label>
+          <label for="history">Medical History</label>
           <textarea id="history" placeholder="e.g., previous surgeries, family history" required></textarea>
         </div>
         <div class="form-group">
-          <label for="details">4. Enter your age, weight, etc.:</label>
+          <label for="details">Age/Weight</label>
           <textarea id="details" placeholder="e.g., 35 years, 70kg" required></textarea>
         </div>
         <div class="form-group">
-          <label for="otherDetails">5. Any other important details:</label>
-          <textarea id="otherDetails" placeholder="e.g., lifestyle, daily habits"></textarea>
+          <label for="otherDetails">Additional Details</label>
+          <textarea id="otherDetails" placeholder="Lifestyle, daily habits, etc."></textarea>
         </div>
         <div class="form-group location-group">
-          <label>6. Location:</label>
-          <input type="text" id="location" placeholder="Your location will appear here" readonly>
-          <button type="button" id="getLocation">Get My Location</button>
+          <label>Location</label>
+          <input type="text" id="location" placeholder="Auto-detected location" readonly>
+          <button type="button" id="getLocation">Get Location</button>
         </div>
         <div class="form-group">
           <button type="submit" id="submitBtn">Submit</button>
         </div>
       </form>
-      
-      <!-- Heart Rate Section -->
-      <section id="heartRate" class="results">
-        <h3>Heart Rate</h3>
+    </section>
+
+    <!-- Right side: Results Section -->
+    <section class="results-section">
+      <div class="card" id="heartRate">
+        <h2>Current Heart Rate</h2>
         <p id="bpmDisplay" class="heart-rate">Loading...</p>
-      </section>
-      
-      <!-- AI Output Section -->
-      <section id="aiResults" class="results"></section>
-    </main>
-  </div>
+        <div class="chart-container">
+          <canvas id="bpmChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card" id="aiResults">
+        <!-- Results will be rendered here -->
+      </div>
+    </section>
+  </main>
+
   <script src="app.js"></script>
 </body>
 </html>
