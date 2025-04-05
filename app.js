@@ -77,7 +77,7 @@ Return ONLY valid JSON in this exact structure with no extra keys or text.`;
   try {
     // Call the OpenAI API with a system message to enforce the JSON structure
     const completion = await openAIClient.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4-turbo",
       messages: [
         {
           role: "system",
