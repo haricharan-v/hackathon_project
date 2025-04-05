@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PulseCompass</title>
-  
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
   <!-- Chart.js for live BPM visualization -->
@@ -17,9 +17,17 @@
     <div class="tagline">Navigate Your Health Journey</div>
   </header>
 
-  <main class="main-content">
-    <!-- Left side: Health Form -->
-    <section class="form-section">
+  <!-- MOBILE TABS (for screens < 768px) -->
+  <nav class="mobile-tabs">
+    <button class="tab-btn" data-target="mobileInputTab">Input</button>
+    <button class="tab-btn" data-target="mobileHeartTab">Heart Rate</button>
+    <button class="tab-btn" data-target="mobileResultsTab">Results</button>
+  </nav>
+
+  <!-- MOBILE CONTENT -->
+  <div id="mobileContent">
+    <!-- Tab 1: Input -->
+    <section id="mobileInputTab" class="tab-section">
       <h2>Health Details</h2>
       <form id="healthForm">
         <div class="form-group">
@@ -44,8 +52,10 @@
         </div>
         <div class="form-group location-group">
           <label>Location</label>
-          <input type="text" id="location" placeholder="Auto-detected location" readonly>
-          <button type="button" id="getLocation">Get Location</button>
+          <div class="location-row">
+            <input type="text" id="location" placeholder="Auto-detected location" readonly>
+            <button type="button" id="getLocation">Get Location</button>
+          </div>
         </div>
         <div class="form-group">
           <button type="submit" id="submitBtn">Submit</button>
@@ -53,18 +63,74 @@
       </form>
     </section>
 
-    <!-- Right side: Results Section -->
+    <!-- Tab 2: Heart Rate -->
+    <section id="mobileHeartTab" class="tab-section">
+      <h2>Current Heart Rate</h2>
+      <p id="bpmDisplayMobile" class="heart-rate">Loading...</p>
+      <div class="chart-container">
+        <canvas id="bpmChartMobile"></canvas>
+      </div>
+    </section>
+
+    <!-- Tab 3: Results -->
+    <!-- No <h2> here to avoid double "Results" heading -->
+    <section id="mobileResultsTab" class="tab-section">
+      <div id="mobileAiResults" class="results-content"></div>
+    </section>
+  </div>
+
+  <!-- DESKTOP LAYOUT (for screens >= 768px) -->
+  <main class="main-content">
+    <!-- Left side: Health Form -->
+    <section class="form-section">
+      <h2>Health Details</h2>
+      <form id="healthFormDesktop">
+        <div class="form-group">
+          <label for="symptomsDesktop">Symptoms</label>
+          <textarea id="symptomsDesktop" placeholder="e.g., headache, fatigue" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="conditionsDesktop">Conditions</label>
+          <textarea id="conditionsDesktop" placeholder="e.g., hypertension, asthma" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="historyDesktop">Medical History</label>
+          <textarea id="historyDesktop" placeholder="e.g., previous surgeries, family history" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="detailsDesktop">Age/Weight</label>
+          <textarea id="detailsDesktop" placeholder="e.g., 35 years, 70kg" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="otherDetailsDesktop">Additional Details</label>
+          <textarea id="otherDetailsDesktop" placeholder="Lifestyle, daily habits, etc."></textarea>
+        </div>
+        <div class="form-group location-group">
+          <label>Location</label>
+          <div class="location-row">
+            <input type="text" id="locationDesktop" placeholder="Auto-detected location" readonly>
+            <button type="button" id="getLocationDesktop">Get Location</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <button type="submit" id="submitBtnDesktop">Submit</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Right side: Heart Rate + Results -->
     <section class="results-section">
-      <div class="card" id="heartRate">
+      <div class="card" id="heartRateDesktop">
         <h2>Current Heart Rate</h2>
-        <p id="bpmDisplay" class="heart-rate">Loading...</p>
+        <p id="bpmDisplayDesktop" class="heart-rate">Loading...</p>
         <div class="chart-container">
-          <canvas id="bpmChart"></canvas>
+          <canvas id="bpmChartDesktop"></canvas>
         </div>
       </div>
 
-      <div class="card" id="aiResults">
-        <!-- Results will be rendered here -->
+      <div class="card" id="aiResultsDesktop">
+        <!-- No <h2> here to avoid double "Results" heading -->
+        <div id="aiResultsContent" class="results-content"></div>
       </div>
     </section>
   </main>
