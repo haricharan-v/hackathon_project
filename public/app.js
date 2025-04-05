@@ -1,7 +1,9 @@
 // public/app.js
 
-// Global variable to store location data
+// Global variables to store location data
 let userLocation = "";
+let userLatitude = "";
+let userLongitude = "";
 
 // Event listener for the "Get My Location" button
 document.getElementById("getLocation").addEventListener("click", function () {
@@ -13,9 +15,10 @@ document.getElementById("getLocation").addEventListener("click", function () {
 });
 
 function successCallback(position) {
-  const latitude = position.coords.latitude.toFixed(5);
-  const longitude = position.coords.longitude.toFixed(5);
-  userLocation = `Lat: ${latitude}, Lon: ${longitude}`;
+  userLatitude = position.coords.latitude;
+  userLongitude = position.coords.longitude;
+  // Format location string for display
+  userLocation = `Lat: ${userLatitude.toFixed(5)}, Lon: ${userLongitude.toFixed(5)}`;
   document.getElementById("location").value = userLocation;
 }
 
@@ -24,7 +27,7 @@ function errorCallback(error) {
   alert("Unable to retrieve your location. Please enter it manually if needed.");
 }
 
-// Form submission handler
+// Handle form submission
 document.getElementById("healthForm").addEventListener("submit", function (event) {
   event.preventDefault(); // Prevent default form submission
 
@@ -41,19 +44,37 @@ document.getElementById("healthForm").addEventListener("submit", function (event
   const otherDetails = document.getElementById("otherDetails").value;
   const location = userLocation || document.getElementById("location").value || "Not provided";
 
-  // Send the collected data to the /analyze endpoint via a POST request
+  // Send the collected data to the /analyze endpoint
   fetch("/analyze", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ symptoms, conditions, history, details, otherDetails, location }),
+    body: JSON.stringify({
+      symptoms,
+      conditions,
+      history,
+      details,
+      otherDetails,
+      location,
+      latitude: userLatitude,
+      longitude: userLongitude,
+    }),
   })
     .then((response) => response.json())
     .then((data) => {
       const aiResults = document.getElementById("aiResults");
 
       if (data.success && data.data) {
-        // Extract keys from the parsed JSON response
-        const { weather_statement, heart_rate_assessment, outdoor_exercises, outdoor_foods, potential_diseases } = data.data;
+        const {
+          weather_statement,
+          heart_rate_assessment,
+          outdoor_exercises,
+          outdoor_foods,
+          potential_diseases,
+          nearby_gyms,
+          medicine_stores,
+          food_stores,
+        } = data.data;
+
         let htmlOutput = `<h2>AI Output</h2>`;
 
         if (weather_statement) {
@@ -89,6 +110,34 @@ document.getElementById("healthForm").addEventListener("submit", function (event
           </ul>
         </div>`;
 
+        // New sections for location-based info:
+        if (nearby_gyms && nearby_gyms.length > 0) {
+          htmlOutput += `<div class="section">
+            <h3>Nearby Gyms</h3>
+            <ul>
+              ${nearby_gyms.map(gym => `<li><strong>${gym.name}</strong>: ${gym.address}</li>`).join("")}
+            </ul>
+          </div>`;
+        }
+
+        if (medicine_stores && medicine_stores.length > 0) {
+          htmlOutput += `<div class="section">
+            <h3>Medicine Stores</h3>
+            <ul>
+              ${medicine_stores.map(store => `<li><strong>${store.name}</strong>: ${store.address}</li>`).join("")}
+            </ul>
+          </div>`;
+        }
+
+        if (food_stores && food_stores.length > 0) {
+          htmlOutput += `<div class="section">
+            <h3>Food Stores</h3>
+            <ul>
+              ${food_stores.map(store => `<li><strong>${store.name}</strong>: ${store.address}</li>`).join("")}
+            </ul>
+          </div>`;
+        }
+
         aiResults.innerHTML = htmlOutput;
       } else if (data.rawResponse) {
         aiResults.innerHTML = `
@@ -105,7 +154,7 @@ document.getElementById("healthForm").addEventListener("submit", function (event
       alert("An error occurred while processing your request.");
     })
     .finally(() => {
-      // Reset the submit button: enable it and revert its text
+      // Re-enable the submit button and reset its text
       submitBtn.disabled = false;
       submitBtn.innerHTML = 'Submit';
     });
@@ -117,7 +166,6 @@ function updateHeartRate() {
     .then((response) => response.json())
     .then((data) => {
       const bpmDisplay = document.getElementById("bpmDisplay");
-      // If the Arduino hasn't measured a valid BPM yet, show "Measuring heart rate..."
       if (data.bpm <= 0) {
         bpmDisplay.textContent = "Measuring heart rate...";
       } else {
@@ -126,7 +174,6 @@ function updateHeartRate() {
     })
     .catch((err) => console.error("Error fetching heart rate:", err));
 }
-
 
 // Poll the heart rate every 2 seconds
 setInterval(updateHeartRate, 2000);

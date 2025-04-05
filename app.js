@@ -1,13 +1,13 @@
-// app.js (Server Code)
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
 const OpenAI = require("openai");
-
-// Use updated SerialPort API
 const { SerialPort } = require("serialport");
 const { ReadlineParser } = require("@serialport/parser-readline");
+
+// Hardcode the weather statement
+const weatherNow = "Cloudy with sunny breaks around 10°C, feels like 7°C";
 
 // Replace with your actual Arduino port path (e.g., "COM5")
 const arduinoPortPath = "COM5";
@@ -41,9 +41,6 @@ const openAIClient = new OpenAI({
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Hardcode a "current weather" string for your demo
-const weatherNow = "Cloudy with sunny breaks around 10°C, feels like 7°C";
-
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
@@ -54,7 +51,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.post("/analyze", async (req, res) => {
   const { symptoms, conditions, history, details, otherDetails, location } = req.body;
 
-  // Build a prompt that includes the heart rate reading along with other patient details
+  // Build a prompt that includes the fixed weather statement
   const prompt = `Patient Details:
 Symptoms: ${symptoms}
 Conditions: ${conditions}
@@ -65,31 +62,36 @@ Heart Rate: ${latestBPM} BPM.
 Location: ${location}
 Weather: ${weatherNow}
 
-Based on the above information, provide your response in JSON with five keys:
-- "weather_statement": a sentence that starts with "Since the weather outside currently is ..." describing the weather and leading into the recommendations.
-- "heart_rate_assessment": a brief statement assessing the heart rate (for example, if it's above a typical resting value, mention that it is high).
-- "outdoor_exercises": an array where each item is an object with "name" (the exercise) and "explanation" (why it's beneficial).
-- "outdoor_foods": an array where each item is an object with "name" (the food) and "explanation" (why it's beneficial).
-- "potential_diseases": an array where each item is an object with "name" (the potential disease) and "explanation" (why it might be a concern).
-
+Based on the above information, provide your response in JSON with the following structure:
+{
+  "weather_statement": "A sentence explaining the current weather and leading into the recommendations",
+  "heart_rate_assessment": "A brief assessment of the patient's heart rate",
+  "outdoor_exercises": [ { "name": "exercise name", "explanation": "explanation text" }, ... ],
+  "outdoor_foods": [ { "name": "food name", "explanation": "explanation text" }, ... ],
+  "potential_diseases": [ { "name": "disease name", "explanation": "explanation text" }, ... ],
+  "nearby_gyms": [ { "name": "Gym Name", "address": "Address or description" }, ... ],
+  "medicine_stores": [ { "name": "Store Name", "address": "Address or description" }, ... ],
+  "food_stores": [ { "name": "Store Name", "address": "Address or description" }, ... ]
+}
 Return ONLY valid JSON in this exact structure with no extra keys or text.`;
 
   try {
-    // Call the OpenAI API with a system message to enforce the JSON structure
     const completion = await openAIClient.chat.completions.create({
       model: "gpt-4-turbo",
       messages: [
         {
           role: "system",
-          content:
-            `You are a medical advisor AI that provides personalized health advice.
+          content: `You are a medical advisor AI that provides personalized health advice.
 Return ONLY valid JSON in this exact structure:
 {
   "weather_statement": "A sentence explaining the current weather and leading into the recommendations",
   "heart_rate_assessment": "A brief assessment of the patient's heart rate",
   "outdoor_exercises": [ { "name": "exercise name", "explanation": "explanation text" }, ... ],
   "outdoor_foods": [ { "name": "food name", "explanation": "explanation text" }, ... ],
-  "potential_diseases": [ { "name": "disease name", "explanation": "explanation text" }, ... ]
+  "potential_diseases": [ { "name": "disease name", "explanation": "explanation text" }, ... ],
+  "nearby_gyms": [ { "name": "Gym Name", "address": "Address or description" }, ... ],
+  "medicine_stores": [ { "name": "Store Name", "address": "Address or description" }, ... ],
+  "food_stores": [ { "name": "Store Name", "address": "Address or description" }, ... ]
 }
 Do not include any extra text or keys outside the JSON.`
         },
@@ -101,10 +103,8 @@ Do not include any extra text or keys outside the JSON.`
       temperature: 0.9,
     });
 
-    // Extract the AI's reply (should be valid JSON)
+    // Extract and parse the AI's reply
     const aiResponse = completion.choices[0].message.content.trim();
-
-    // Attempt to parse the JSON response
     let parsed;
     try {
       parsed = JSON.parse(aiResponse);
@@ -117,7 +117,6 @@ Do not include any extra text or keys outside the JSON.`
       });
     }
 
-    // Send parsed JSON to the client
     res.json({
       success: true,
       data: parsed,

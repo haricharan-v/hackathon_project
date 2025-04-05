@@ -3,38 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Personalized Health Advice</title>
-  <!-- Using Google Fonts for a modern look -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <title>PulseCompass</title>
+  <!-- Google Fonts for a modern look -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>Personalized Health Advice</h1>
-      <p>Your heart leads the way</p>
+      <h1>PulseCompass</h1>
+      <p class="tagline">Navigate Your Health Journey</p>
     </header>
     <main>
       <form id="healthForm">
         <div class="form-group">
           <label for="symptoms">1. Enter your symptoms:</label>
-          <textarea id="symptoms" required></textarea>
+          <textarea id="symptoms" placeholder="e.g., headache, fatigue" required></textarea>
         </div>
         <div class="form-group">
           <label for="conditions">2. Enter your conditions:</label>
-          <textarea id="conditions" required></textarea>
+          <textarea id="conditions" placeholder="e.g., hypertension, asthma" required></textarea>
         </div>
         <div class="form-group">
           <label for="history">3. Enter your medical history:</label>
-          <textarea id="history" required></textarea>
+          <textarea id="history" placeholder="e.g., previous surgeries, family history" required></textarea>
         </div>
         <div class="form-group">
           <label for="details">4. Enter your age, weight, etc.:</label>
-          <textarea id="details" required></textarea>
+          <textarea id="details" placeholder="e.g., 35 years, 70kg" required></textarea>
         </div>
         <div class="form-group">
           <label for="otherDetails">5. Any other important details:</label>
-          <textarea id="otherDetails"></textarea>
+          <textarea id="otherDetails" placeholder="e.g., lifestyle, daily habits"></textarea>
         </div>
         <div class="form-group location-group">
           <label>6. Location:</label>
@@ -46,13 +46,13 @@
         </div>
       </form>
       
-      <!-- Moved Heart Rate Section Above AI Output -->
+      <!-- Heart Rate Section -->
       <section id="heartRate" class="results">
         <h3>Heart Rate</h3>
         <p id="bpmDisplay" class="heart-rate">Loading...</p>
       </section>
       
-      <!-- Section to display AI Output -->
+      <!-- AI Output Section -->
       <section id="aiResults" class="results"></section>
     </main>
   </div>
