@@ -13,6 +13,9 @@ const openAIClient = new OpenAI({
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Hardcode a "current weather" string for your pitch/demo
+const weatherNow = "Cloudy with sunny breaks around 10°C, feels like 7°C";
+
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
@@ -21,21 +24,25 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // POST endpoint to process form submission and call OpenAI API
 app.post("/analyze", async (req, res) => {
-  const { symptoms, conditions, history, details, otherDetails } = req.body;
+  const { symptoms, conditions, history, details, otherDetails, location } = req.body;
 
-  // Build a prompt incorporating the patient's details
+  // Build a prompt incorporating the patient's details + hardcoded weather
   const prompt = `Patient Details:
 Symptoms: ${symptoms}
 Conditions: ${conditions}
 Medical History: ${history}
 Age/Weight/Other Details: ${details}
 Other Important Details: ${otherDetails}
+Location: ${location}
+Weather: ${weatherNow}
 
-Based on the above information, provide your response in JSON with three arrays:
-- "outdoor_exercises": (list of recommended exercises)
-- "outdoor_foods": (list of recommended foods)
-- "potential_diseases": (list of potential diseases).
-No extra keys, no additional text outside the JSON.`;
+Based on the above information, provide your response in JSON with four keys:
+- "weather_statement": a sentence that starts with "Since the weather outside currently is ..." describing the weather (based on the string above) and leading into the exercise recommendations.
+- "outdoor_exercises": an array where each item is an object with "name" (the exercise) and "explanation" (why it's beneficial).
+- "outdoor_foods": an array where each item is an object with "name" (the food) and "explanation" (why it's beneficial).
+- "potential_diseases": an array where each item is an object with "name" (the potential disease) and "explanation" (why it might be a concern).
+
+Return ONLY valid JSON in this exact structure with no extra keys or text.`;
 
   try {
     // Call the OpenAI API with a system message to strictly return JSON
@@ -48,9 +55,10 @@ No extra keys, no additional text outside the JSON.`;
             `You are a medical advisor AI that provides personalized health advice. 
              Return ONLY valid JSON in this exact structure:
              {
+                "weather_statement": "A sentence explaining the current weather and leading into the recommendations",
                 "outdoor_exercises": [ { "name": "exercise name", "explanation": "explanation text" }, ... ],
-               "outdoor_foods": [ { "name": "food name", "explanation": "explanation text" }, ... ],
-               "potential_diseases": [ { "name": "disease name", "explanation": "explanation text" }, ... ]
+                "outdoor_foods": [ { "name": "food name", "explanation": "explanation text" }, ... ],
+                "potential_diseases": [ { "name": "disease name", "explanation": "explanation text" }, ... ]
              }
              Do not include any extra text or keys outside the JSON.`
         },
@@ -70,7 +78,6 @@ No extra keys, no additional text outside the JSON.`;
     try {
       parsed = JSON.parse(aiResponse);
     } catch (err) {
-      // If parsing fails, we'll just send back the raw text
       console.error("Failed to parse AI response as JSON:", aiResponse);
       return res.status(200).json({
         success: false,
